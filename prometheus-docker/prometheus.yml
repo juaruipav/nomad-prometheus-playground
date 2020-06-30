@@ -1,0 +1,30 @@
+---
+global:
+  scrape_interval:     5s
+  evaluation_interval: 5s
+
+
+scrape_configs:
+
+  - job_name: 'nomad_metrics'
+
+    consul_sd_configs:
+    - server: '${CONSUL_MASTER_ADDR}:8500'
+      services: ['nomad-client', 'nomad']
+
+    relabel_configs:
+    - source_labels: ['__meta_consul_tags']
+      regex: '(.*)http(.*)'
+      action: keep
+
+    scrape_interval: 5s
+    metrics_path: /v1/metrics
+    params:
+      format: ['prometheus']
+
+
+  - job_name: my_custom_scraper
+    scrape_interval: 10s
+    static_configs:
+    - targets:
+      - ${APP_SCRAPER_ADDR}

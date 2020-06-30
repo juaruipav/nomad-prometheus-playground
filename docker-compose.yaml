@@ -1,0 +1,83 @@
+version: "3.0"
+
+services:
+
+  grafana:
+    hostname: graf
+    image: grafana/grafana:latest
+    network_mode: bridge
+    privileged: true
+    ports:
+      - 3000:3000
+    volumes:
+        - grafana-storage:/var/lib/grafana grafana/grafana
+    links:
+      - server-1
+
+  prometheus:
+    hostname: prom
+    image: prometheus-env:0.1.0
+    privileged: true
+    network_mode: bridge
+    ports:
+      - 9090:9090
+    environment:
+      CONSUL_MASTER_ADDR: server-1
+      APP_SCRAPER_ADDR: prometheus-scraper:2112
+    links:
+        - server-1
+        - prometheus-scraper
+
+  prometheus-scraper:
+    hostname: scraper
+    image: prometheus-scraper:0.1.0
+    network_mode: bridge
+    environment:
+        MACHINE_1: client-1
+        MACHINE_2: client-2
+    links:
+        - client-1
+        - server-1
+        - client-2
+
+  client-1:
+      hostname: client-1
+      privileged: true
+      image: hashi-client:0.1.0
+      network_mode: bridge
+      environment:
+        NOMAD_MASTER_ADDR: server-1
+        CONSUL_MASTER_ADDR: server-1
+      links:
+        - server-1
+
+  client-2:
+      hostname: client-2
+      privileged: true
+      image: hashi-client:0.1.0
+      network_mode: bridge
+      environment:
+        NOMAD_MASTER_ADDR: server-1 
+        CONSUL_MASTER_ADDR: server-1
+      links:
+        - server-1
+      
+  client-3:
+      hostname: client-3
+      image: hashi-client:0.1.0
+      privileged: true
+      network_mode: bridge
+      environment:
+        NOMAD_MASTER_ADDR: server-1 
+        CONSUL_MASTER_ADDR: server-1
+      links:
+        - server-1
+
+  server-1:
+      hostname: server-1
+      privileged: true
+      image: hashi-server:0.1.0
+      network_mode: bridge
+ 
+volumes:
+  grafana-storage:

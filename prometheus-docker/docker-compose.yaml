@@ -1,0 +1,17 @@
+version: "2.3"
+
+services:
+  prometheus-env:
+    image: prometheus-env:0.1.0
+    build: .
+    privileged: true
+    network_mode: bridge
+    ports:
+      - 9090:9090
+    environment:
+      CONSUL_MASTER_ADDR: 172.17.0.1:8500
+      APP_SCRAPER_ADDR: 127.0.0.1:2112
+    volumes:
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+    

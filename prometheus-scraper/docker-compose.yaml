@@ -1,0 +1,7 @@
+version: "2.3"
+
+services:
+  prometheus-scraper:
+    image: prometheus-scraper:0.1.0
+    build: .
+    

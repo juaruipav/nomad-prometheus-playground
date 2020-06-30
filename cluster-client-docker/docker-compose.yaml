@@ -1,0 +1,7 @@
+version: "2.3"
+
+services:
+  hashi-base-image:
+    image: hashi-client:0.1.0
+    build: .
+    
